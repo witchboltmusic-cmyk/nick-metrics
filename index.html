@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1412">
+<title>Nick Metrics — Two Simple Screens</title>
+<style>
+  :root {
+    --bg:#0b1412;--panel:#14241e;--panel2:#22382e;--ink:#eff2df;
+    --muted:#a8b9a8;--green:#d9ef9c;--orange:#f2a077;--line:#43564b;
+    --accent-ink:#111910;--secondary-ink:#111910;
+    --condensed:Impact,'Arial Narrow','Franklin Gothic Condensed',Arial,sans-serif;
+    --mono:Consolas,'Liberation Mono',monospace;
+  }
+  * {box-sizing:border-box}
+  html,body {width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink)}
+  body {font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+  .tv {height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden;position:relative;background:radial-gradient(ellipse at 60% 42%,var(--panel2) 0%,var(--bg) 73%)}
+  .header {height:clamp(63px,9vh,92px);flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,3.5vw,66px);border-bottom:1px solid var(--line);background:var(--bg);gap:18px;z-index:5}
+  .brand {display:flex;align-items:center;gap:16px;min-width:0}
+  .logo {background:var(--green);color:var(--accent-ink);font-family:var(--condensed);font-size:clamp(28px,3.3vw,46px);line-height:1;padding:8px 11px 5px;transform:skew(-4deg);letter-spacing:-.02em}
+  .brand-name {font-weight:900;letter-spacing:.11em;font-size:clamp(13px,1.5vw,23px);white-space:nowrap}
+  .right {display:flex;align-items:center;gap:22px}
+  .clock {font:700 clamp(16px,2vw,29px) var(--mono);color:var(--green);white-space:nowrap}
+  button {background:none;border:1px solid var(--line);color:var(--ink);border-radius:4px;width:35px;height:35px;cursor:pointer;font-size:16px;display:grid;place-items:center}
+  button:hover,button:focus-visible {outline:2px solid var(--green);outline-offset:2px}
+  .controlset {display:flex;gap:8px}
+  .screenwrap {position:relative;min-height:0;flex:1;isolation:isolate}
+  .screen {position:absolute;inset:0;display:flex;flex-direction:column;padding:clamp(20px,3.0vh,45px) clamp(18px,4.3vw,88px) clamp(18px,3vh,42px);gap:clamp(15px,2.5vh,32px);animation:arrive .7s both;min-height:0}
+  .screen.exit {animation:depart .36s ease-in both;pointer-events:none}
+  .screen-title {display:flex;align-items:flex-end;gap:24px;flex:0 0 auto;min-height:0}
+  h1 {font-family:var(--condensed);font-size:clamp(65px,10.2vw,170px);line-height:.79;margin:0;letter-spacing:-.015em;text-transform:uppercase;font-weight:900}
+  .screen-subtitle {font:700 clamp(13px,1.5vw,25px) var(--mono);letter-spacing:.04em;color:var(--green);padding-bottom:7px}
+  .columns {display:grid;grid-template-columns:1fr 1fr;gap:clamp(15px,2.3vw,38px);min-height:0;flex:1}
+  .panel {background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);min-width:0;min-height:0;display:flex;flex-direction:column;padding:clamp(18px,2.2vw,36px);overflow:hidden;box-shadow:inset 0 0 60px #00000022}
+  .panel-head {display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:2px solid var(--line);padding-bottom:clamp(12px,1.5vh,20px);margin-bottom:clamp(11px,1.5vh,20px);flex:0 0 auto}
+  .panel-title {font:900 clamp(23px,3.1vw,56px)/1 var(--condensed);letter-spacing:.025em}
+  .count {font:700 clamp(14px,1.7vw,26px) var(--mono);color:var(--green);white-space:nowrap}
+  .feed {display:flex;flex-direction:column;justify-content:space-around;gap:clamp(6px,1vh,14px);height:100%;min-height:0}
+  .feed-item {display:flex;align-items:center;gap:clamp(12px,1.4vw,23px);border-bottom:1px solid var(--line);padding:clamp(7px,1vh,14px) 0;flex:1;min-height:0}
+  .feed-item:last-child {border:0}
+  .symbol {display:flex;align-items:center;justify-content:center;flex:0 0 clamp(45px,3.8vw,72px);width:clamp(45px,3.8vw,72px);height:clamp(45px,3.8vw,72px);border:2px solid var(--green);color:var(--green);font:900 clamp(21px,2.2vw,42px) var(--mono)}
+  .feed-text {font-weight:750;font-size:clamp(25px,2.85vw,56px);line-height:1.14;letter-spacing:-.025em;overflow-wrap:anywhere}
+  .feed-text small {display:block;color:var(--muted);font-size:clamp(18px,1.85vw,34px);margin-top:12px;font-weight:650;line-height:1.2}
+  .food-content {display:flex;flex-direction:column;justify-content:center;flex:1}
+  .money-amount {font:900 clamp(68px,9vw,160px)/1 var(--condensed);letter-spacing:-.03em;color:var(--green);margin:0 0 clamp(6px,1.5vh,22px)}
+  .money-label {font:750 clamp(23px,2.1vw,38px) var(--mono);color:var(--ink)}
+  .bill {margin-top:auto;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:clamp(17px,2vh,28px) 0 4px;gap:16px}
+  .bill span {font-weight:750;font-size:clamp(25px,2.35vw,44px)}
+  .bill strong {font:900 clamp(34px,5vw,82px)/1 var(--condensed);color:var(--orange)}
+  .project-row {display:flex;justify-content:space-between;align-items:center;gap:22px;border-bottom:1px solid var(--line);padding:clamp(12px,1.4vh,21px) 0;min-height:0;flex:1}
+  .project-row:last-child {border-bottom:0}
+  .project-row .name {font-weight:800;font-size:clamp(30px,3.15vw,61px);line-height:1.04}
+  .project-row .status {color:var(--green);font:800 clamp(19px,1.65vw,32px) var(--mono);white-space:nowrap}
+  .footer {flex:0 0 clamp(69px,11vh,118px);display:flex;flex-direction:column;z-index:6;background:var(--bg);border-top:2px solid var(--line)}
+  .ticker {height:100%;display:flex;align-items:stretch;min-height:0;overflow:hidden;background:var(--green);color:var(--accent-ink)}
+  .ticker-view {overflow:hidden;flex:1;display:flex;align-items:center;min-width:0}
+  .ticker-move {display:flex;align-items:center;width:max-content;white-space:nowrap;animation:marquee 45s linear infinite;font:800 clamp(21px,2.4vw,37px) Arial,sans-serif}
+  .ticker-move span {padding:0 clamp(25px,3.5vw,55px)}
+  .ticker-move i {font-style:normal;color:var(--accent-ink)}
+  .bar {height:4px;background:var(--panel2);flex:0 0 4px}
+  .bar-inner {height:100%;width:0;background:var(--orange);transition:width .2s linear}
+  @keyframes marquee {to {transform:translateX(-50%)}}
+  @keyframes arrive {from {opacity:0;transform:translateY(14px);filter:blur(5px)}to {opacity:1;transform:none;filter:none}}
+  @keyframes depart {to {opacity:0;transform:translateY(-10px);filter:blur(4px)}}
+  @media(max-width:760px) {
+    .header {padding:0 13px;gap:8px}.brand {gap:8px}.brand-name {font-size:11px;letter-spacing:.06em}.logo {font-size:26px;padding:7px 8px 4px}.live {display:none}.right {gap:7px}.clock {font-size:13px}.controlset {gap:4px}button {width:27px;height:29px;font-size:13px}
+    .screen {padding:22px 16px 16px;gap:15px}.screen-title {gap:12px}h1 {font-size:clamp(58px,15vw,95px)}.screen-subtitle{font-size:11px;padding-bottom:3px}.demo {font-size:9px;right:15px;top:70px}
+    .columns {grid-template-columns:1fr;grid-template-rows:1fr 1fr;gap:12px}.panel {padding:12px 14px}.panel-head {margin-bottom:5px;padding-bottom:6px}.panel-title {font-size:26px}.count {font-size:14px}.feed {gap:0}.feed-item {padding:4px 0}.symbol {width:34px;height:34px;flex-basis:34px;font-size:18px;border-width:1px}.feed-text {font-size:clamp(21px,4.25vw,31px)}.feed-text small {font-size:clamp(15px,3.5vw,23px);margin-top:5px}
+    .money-amount {font-size:clamp(50px,13vw,80px);margin-bottom:2px}.money-label {font-size:13px}.bill {padding:7px 0 1px}.bill span {font-size:16px}.bill strong {font-size:38px}.project-row {padding:5px 0}.project-row .name {font-size:clamp(22px,4.5vw,33px)}.project-row .status {font-size:clamp(14px,2.8vw,19px)}
+    .footer {flex-basis:67px}.ticker-move {font-size:19px}
+  }
+  @media (max-height:540px) and (min-width:761px) {
+    .header {height:55px}.screen {padding:14px 30px 10px;gap:12px}h1 {font-size:clamp(56px,9vw,100px)}.panel {padding:14px 20px}.panel-head {padding-bottom:8px;margin-bottom:5px}.feed-item {padding:3px 0}.feed-text {font-size:clamp(17px,2vw,28px)}.feed-text small {margin-top:2px}.footer {flex-basis:60px}
+  }
+  @media (prefers-reduced-motion:reduce) {.ticker-move {animation-duration:90s}.screen{animation-duration:.1s}}
+</style>
+</head>
+<body>
+<div class="tv">
+  <header class="header">
+    <div class="brand"><div class="logo">NMN</div><div class="brand-name">NICK METRICS NETWORK</div></div>
+    <div class="right"><div class="clock" id="clock">--:--</div><div class="controlset"><button id="next" title="Next screen" aria-label="Next screen">⏭</button><button id="fullscreen" title="Fullscreen" aria-label="Fullscreen">⛶</button></div></div>
+  </header>
+  <main class="screenwrap" id="stage" aria-label="Automatically rotating broadcast screens"></main>
+  <footer class="footer">
+    <div class="bar"><div class="bar-inner" id="progress"></div></div>
+    <div class="ticker"><div class="ticker-view"><div class="ticker-move" id="ticker"></div></div></div>
+  </footer>
+</div>
+<script>
+(() => {
+  'use strict';
+
+  // 14 readable color schemes. The chosen palette is determined by the
+  // current calendar day in Central Time, so it changes automatically
+  // at midnight even when this tab stays open on a television.
+  const palettes = [
+    // [background, panel, atmospheric glow, text, muted, accent, secondary, border, accent text, secondary text]
+    ['#0b1412','#14241e','#22382e','#eff2df','#a8b9a8','#d9ef9c','#f2a077','#43564b','#111910','#111910'], // evergreen
+    ['#081329','#102446','#17396b','#f2f7ff','#b9d1f0','#5ae0ff','#ffd268','#476794','#07192f','#2a210c'], // electric blue
+    ['#230e25','#3a193b','#54234c','#fff0f7','#e4b8d6','#ff96d6','#bde77b','#845178','#3b1230','#172310'], // berry neon
+    ['#26170a','#40260e','#573b18','#fff3d5','#dfc3a0','#ffd56e','#80dbd6','#816039','#3c250b','#073536'], // amber
+    ['#061d27','#0d303d','#14515a','#edffff','#a8d1d8','#7af4dc','#ff987d','#3e8990','#07302f','#3b150f'], // deep teal
+    ['#2a0c16','#431728','#6a2730','#fff1eb','#ecc0c1','#ffb36f','#f7de9c','#90505a','#35150c','#37260e'], // crimson
+    ['#19102c','#2b1b4d','#423175','#f6efff','#cfc4ed','#d9a4ff','#87e5da','#68568b','#351440','#073432'], // orchid
+    ['#101b10','#22351b','#3d5925','#f2fce7','#c3d8ae','#dbff66','#ff94ac','#668457','#202a0c','#3f0c20'], // electric lime
+    ['#f5f0e4','#fffaf0','#e4e7e4','#15223f','#56647a','#174cbb','#ed583e','#98a9bd','#ffffff','#ffffff'], // paper & cobalt
+    ['#16212b','#213440','#314e55','#f1fbfb','#b6d2d6','#7fece5','#ffc08c','#627e83','#123030','#3b2108'], // slate coral
+    ['#fff1d8','#fff8e8','#f8d9a7','#342414','#77604c','#9d360e','#246d65','#c5a57e','#ffffff','#ffffff'], // warm cream
+    ['#f0edff','#faf7ff','#ddd5fa','#23183b','#6c627f','#6b3dd1','#008c9c','#a99bce','#ffffff','#ffffff'], // light lavender
+    ['#130c31','#23144b','#3b286a','#f2edff','#d0c2ef','#96a9ff','#fdb4a8','#665991','#0e1d47','#46180d'], // violet
+    ['#131515','#252928','#3c4440','#f7f7e5','#bdc6be','#f6e779','#ff8961','#666c58','#24240a','#40160a']  // graphite citrus
+  ];
+  const propertyNames=['--bg','--panel','--panel2','--ink','--muted','--green','--orange','--line','--accent-ink','--secondary-ink'];
+  const centralDayParts=new Intl.DateTimeFormat('en-US',{
+    timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'
+  });
+  let lastThemeDay='';
+  function applyDailyTheme(){
+    const parts=Object.fromEntries(centralDayParts.formatToParts(new Date()).map(x=>[x.type,x.value]));
+    const dayKey=`${parts.year}-${parts.month}-${parts.day}`;
+    if(dayKey===lastThemeDay)return;
+    lastThemeDay=dayKey;
+    const dayNumber=Math.floor(Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.day))/86400000);
+    const palette=palettes[((dayNumber%palettes.length)+palettes.length)%palettes.length];
+    propertyNames.forEach((name,i)=>document.documentElement.style.setProperty(name,palette[i]));
+    document.querySelector('meta[name="theme-color"]').setAttribute('content',palette[0]);
+  }
+  applyDailyTheme();
+  setInterval(applyDailyTheme,30000);
+  document.addEventListener('visibilitychange',applyDailyTheme);
+  // Replace these values with real, secure data connections in a future version.
+  // All figures, subjects, and actions here are fictional mockup values. Priority scores are illustrative.
+  const data = {
+    tasks:[
+      {title:'Finish website prototype',detail:'In progress',priority:100},
+      {title:'Review soundtrack',detail:'Needs a decision',priority:80},
+      {title:'Follow up on project',detail:'Waiting on reply',priority:30}
+    ],
+    emails:[
+      {title:'Studio team',detail:'Artwork approval',priority:95},
+      {title:'Project contact',detail:'Question to answer',priority:85},
+      {title:'Order update',detail:'Follow-up needed',priority:45}
+    ],
+    food:{spent:'$—'}, // Placeholder until a secure spending data source is connected
+    projects:[
+      {title:'Witch Bolt',status:'ACTIVE',priority:90},
+      {title:"Saint’s Head",status:'IN PROGRESS',priority:85},
+      {title:'Bramhollow',status:'IN PROGRESS',priority:40}
+    ]
+  };
+  const topTwo = items => [...items].sort((a,b) => (b.priority ?? 0) - (a.priority ?? 0)).slice(0,2);
+  const safe = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const tasks = topTwo(data.tasks);
+  const emails = topTwo(data.emails);
+  const activeProjects = topTwo(data.projects);
+  // The bottom crawl is two short nudges, not another overwhelming task list.
+  const line=[
+    `NEXT UP: ${tasks[0]?.title.toUpperCase() || 'YOU’VE GOT THIS'}`,
+    `EMAIL: ${emails[0]?.title.toUpperCase() || 'ALL CAUGHT UP'}`
+  ];
+  const tape=line.map(x=>`<span>${safe(x)}</span><i>✳</i>`).join('');
+  document.getElementById('ticker').innerHTML=tape+tape;
+  const taskRows=tasks.map((x,i)=>`<div class="feed-item"><div class="symbol">${i+1}</div><div class="feed-text">${safe(x.title)}<small>${safe(x.detail)}</small></div></div>`).join('');
+  const mailRows=emails.map((x)=>`<div class="feed-item"><div class="symbol">↗</div><div class="feed-text">${safe(x.title)}<small>${safe(x.detail)}</small></div></div>`).join('');
+  const projects=activeProjects.map(x=>`<div class="project-row"><span class="name">${safe(x.title)}</span><span class="status">${safe(x.status)}</span></div>`).join('');
+  const screens=[
+    `<section class="screen"><div class="screen-title"><h1>TODAY</h1></div><div class="columns"><article class="panel"><div class="panel-head"><span class="panel-title">TO DO</span></div><div class="feed">${taskRows}</div></article><article class="panel"><div class="panel-head"><span class="panel-title">EMAIL</span></div><div class="feed">${mailRows}</div></article></div></section>`,
+    `<section class="screen"><div class="screen-title"><h1>YOUR WORLD</h1></div><div class="columns"><article class="panel"><div class="panel-head"><span class="panel-title">FOOD SPENDING</span></div><div class="food-content"><div class="money-amount">${data.food.spent}</div><div class="money-label">THIS MONTH</div></div></article><article class="panel"><div class="panel-head"><span class="panel-title">PROJECTS</span></div><div class="feed">${projects}</div></article></div></section>`
+  ];
+  const stage=document.getElementById('stage');
+  const progress=document.getElementById('progress');
+  let current=0,elapsed=0,last=performance.now();
+  const duration=26000;
+  function render(index){
+    const old=stage.querySelector('.screen:not(.exit)');
+    if(old){old.classList.add('exit');setTimeout(()=>old.remove(),370)}
+    const slot=document.createElement('div');slot.innerHTML=screens[index];
+    stage.appendChild(slot.firstElementChild);
+    current=index;elapsed=0;progress.style.width='0%';
+  }
+  function advance(){render((current+1)%screens.length)}
+  document.getElementById('next').addEventListener('click',advance);
+  document.getElementById('fullscreen').addEventListener('click',()=>{if(document.fullscreenElement){document.exitFullscreen?.()}else document.documentElement.requestFullscreen?.().catch(()=>{})});
+  document.addEventListener('keydown',ev=>{if(ev.key==='ArrowRight')advance();if(ev.key.toLowerCase()==='f')document.getElementById('fullscreen').click()});
+  const timefmt=new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',hour:'numeric',minute:'2-digit',hour12:true});
+  function clock(){document.getElementById('clock').textContent=timefmt.format(new Date())}
+  clock();setInterval(clock,1000*20);
+  render(0);
+  function frame(now){const dt=Math.min(250,now-last);last=now;elapsed+=dt;progress.style.width=`${Math.min(100,100*elapsed/duration)}%`;if(elapsed>=duration)advance();requestAnimationFrame(frame)}
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
